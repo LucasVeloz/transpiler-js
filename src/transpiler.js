@@ -1,3 +1,6 @@
+const { parentPort, workerData } = require("worker_threads");
+
+const memo = {}
 
 function operations(type, first, second) {
   switch (type) {
@@ -8,8 +11,9 @@ function operations(type, first, second) {
     case 'Mul':
       return first * second;
     case 'Div':
-
       return first / second;
+    case 'Rem':
+      return first % second;
     case 'Eq':
       return first === second;
     case 'Neq':
@@ -29,50 +33,10 @@ function operations(type, first, second) {
   }
 }
 
-const memo = {}
-
-// function operations(type, first, second) {
-//   const key = `${type}-${first}-${second}`
-//   const memoized = memo[key]
-//   console.log(memoized, key)
-//   if (memoized) return memoized
-//   let result;
-//   switch (type) {
-//     case 'Add':
-//       result = first + second;
-//     case 'Sub':
-//       result = first - second;
-//     case 'Mul':
-//       result = first * second;
-//     case 'Div':
-//       result = first / second;
-//     case 'Eq':
-//       result = first === second;
-//     case 'Neq':
-//       result = first !== second;
-//     case 'Lt':
-//       result = first < second;
-//     case 'Gt':
-//       result = first > second;
-//     case 'Lte':
-//       result = first <= second;
-//     case 'Gte':
-//       result = first >= second;
-//     case 'And':
-//       result = first && second;
-//     case 'Or':
-//       result = first || second;
-//   }
-//   memo[key] = result
-//   console.log(result)
-//   return result
-// }
-
-
 function processNode(node, variables) {
   switch (node.kind) {
     case 'Int':
-      return Number(node.value)
+      return BigInt(node.value)
     case 'Str':
       return String(node.value)
     case 'Print':
@@ -107,19 +71,17 @@ function processNode(node, variables) {
       const call = processNode(node.callee, variables)
       const processArgs = node.arguments.map(item => processNode(item, variables))
 
-      const search = `${node.callee.text}-${JSON.stringify(processArgs)}`;
+      const search = `${node.callee.text}-${processArgs.toString()}`;
       const memoized = memo[search]
-      if (!memoized) {
+      if (memoized === undefined) {
         const returnValue = call(processArgs, variables)
         memo[search] = returnValue
         return returnValue
       }
       return memoized
-
     default:
       break;
   }
 };
 
-module.exports = processNode
-
+parentPort.postMessage(processNode(workerData, {}))
