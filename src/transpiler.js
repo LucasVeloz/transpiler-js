@@ -29,6 +29,8 @@ function operations(type, first, second) {
   }
 }
 
+const memo = {}
+
 
 function processNode(node, variables) {
   switch (node.kind) {
@@ -67,7 +69,17 @@ function processNode(node, variables) {
       }
     case 'Call':
       const call = processNode(node.callee, variables)
-      return call(node.arguments, variables)
+
+      // memorizar função com valor
+      const search = `${node.callee.text}-${node.arguments.toString()}`;
+      const memoized = memo[search]
+      if (!memoized) {
+        const returnValue = call(node.arguments, variables)
+        memo[search] = returnValue
+        return returnValue
+      }
+      return memoized
+
     default:
       break;
   }
