@@ -80,6 +80,7 @@ function processNode(node, variables) {
       }
       return memoized
     default:
+      console.error('Termo não encontrado', node.kind)
       break;
   }
 };
