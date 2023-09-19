@@ -51,7 +51,7 @@ function processNode(node, variables) {
       if (value === undefined) throw new Error('Variável não definida')
       return value
     case 'Binary':
-      const toReturn =  operations(node.op, processNode(node.lhs, variables), processNode(node.rhs, variables))
+      const toReturn = operations(node.op, processNode(node.lhs, variables), processNode(node.rhs, variables))
       return toReturn;
     case 'Function':
       return (args, variables) => {
