@@ -1,8 +1,8 @@
-const json = require('../files/fib.json')
-// const json = require('./files/source.rinha.json')
-const transpiler = require('./transpiler')
+// const json = require('../files/fib.json')
+const json = require('../files/source.rinha.json')
+const processNode = require('./transpiler')
 
 
 console.time('transpiler')
-transpiler(json.expression)
+processNode(json.expression, {})
 console.timeEnd('transpiler')

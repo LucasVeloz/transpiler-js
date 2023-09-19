@@ -1,4 +1,3 @@
-const variables = {};
 
 function operations(type, first, second) {
   switch (type) {
@@ -9,6 +8,7 @@ function operations(type, first, second) {
     case 'Mul':
       return first * second;
     case 'Div':
+
       return first / second;
     case 'Eq':
       return first === second;
@@ -30,34 +30,48 @@ function operations(type, first, second) {
 }
 
 
-function decisions(node) {
+function processNode(node, variables) {
   switch (node.kind) {
     case 'Int':
-      return node.value
+      return Number(node.value)
     case 'Str':
-      return node.value
+      return String(node.value)
     case 'Print':
-      return console.log(decisions(node.value))
+      return console.log(processNode(node.value, variables))
     case 'Bool':
-      return node.value
+      return Boolean(node.value)
     case 'Let':
-      variables[node.name.text] = decisions(node.value)
-      return decisions(node.next)
+      variables[node.name.text] = processNode(node.value, variables)
+      return processNode(node.next, {...variables })
     case 'Var':
       const value = variables[node.text];
-      if (value === undefined) throw new Error('Variavel não definida')
+      if (value === undefined) throw new Error('Variável não definida')
       return value
     case 'Binary':
-      return operations(node.op, decisions(node.lhs), decisions(node.rhs))
+      const toReturn =  operations(node.op, processNode(node.lhs, variables), processNode(node.rhs, variables))
+      return toReturn;
     case 'Function':
-      const params = node.parameters.map(item => item.text);
-      return (params => {
-        console.log('---> função', params)
-      })()
+      return (args, variables) => {
+        const processArgs = args.map(item => processNode(item, variables))
+        const scopeVariables = { ...variables }
+        node.parameters.forEach((item, index) => {
+          scopeVariables[item.text] = processArgs[index]
+        })
+        return processNode(node.value, { ...scopeVariables })
+      }
+    case 'If':
+      if (processNode(node.condition, variables)) {
+        return processNode(node.then, variables)
+      } else {
+        return processNode(node.otherwise, variables)
+      }
+    case 'Call':
+      const call = processNode(node.callee, variables)
+      return call(node.arguments, variables)
     default:
       break;
   }
 };
 
-module.exports = decisions
+module.exports = processNode
 
