@@ -31,6 +31,43 @@ function operations(type, first, second) {
 
 const memo = {}
 
+// function operations(type, first, second) {
+//   const key = `${type}-${first}-${second}`
+//   const memoized = memo[key]
+//   console.log(memoized, key)
+//   if (memoized) return memoized
+//   let result;
+//   switch (type) {
+//     case 'Add':
+//       result = first + second;
+//     case 'Sub':
+//       result = first - second;
+//     case 'Mul':
+//       result = first * second;
+//     case 'Div':
+//       result = first / second;
+//     case 'Eq':
+//       result = first === second;
+//     case 'Neq':
+//       result = first !== second;
+//     case 'Lt':
+//       result = first < second;
+//     case 'Gt':
+//       result = first > second;
+//     case 'Lte':
+//       result = first <= second;
+//     case 'Gte':
+//       result = first >= second;
+//     case 'And':
+//       result = first && second;
+//     case 'Or':
+//       result = first || second;
+//   }
+//   memo[key] = result
+//   console.log(result)
+//   return result
+// }
+
 
 function processNode(node, variables) {
   switch (node.kind) {
@@ -54,10 +91,9 @@ function processNode(node, variables) {
       return toReturn;
     case 'Function':
       return (args, variables) => {
-        const processArgs = args.map(item => processNode(item, variables))
         const scopeVariables = { ...variables }
         node.parameters.forEach((item, index) => {
-          scopeVariables[item.text] = processArgs[index]
+          scopeVariables[item.text] = args[index]
         })
         return processNode(node.value, { ...scopeVariables })
       }
@@ -69,12 +105,12 @@ function processNode(node, variables) {
       }
     case 'Call':
       const call = processNode(node.callee, variables)
+      const processArgs = node.arguments.map(item => processNode(item, variables))
 
-      // memorizar função com valor
-      const search = `${node.callee.text}-${node.arguments.toString()}`;
+      const search = `${node.callee.text}-${JSON.stringify(processArgs)}`;
       const memoized = memo[search]
       if (!memoized) {
-        const returnValue = call(node.arguments, variables)
+        const returnValue = call(processArgs, variables)
         memo[search] = returnValue
         return returnValue
       }
