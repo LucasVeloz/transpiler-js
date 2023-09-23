@@ -91,6 +91,10 @@ function processNode(node, variables) {
 
     case 'Tuple':
       return [processNode(node.first), processNode(node.second)]
+    case 'First':
+      return processNode(node.value.first)
+    case 'Second':
+      return processNode(node.value.second)
     default:
       console.error('Termo não encontrado', node.kind)
       break;

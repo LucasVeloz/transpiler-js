@@ -6,4 +6,4 @@ let fib = fn (n) => {
   }
 };
 
-let _  = print (fib(4946)); print ((5, 10))
+print(fib(3490)) + print(second((10, 30)))
