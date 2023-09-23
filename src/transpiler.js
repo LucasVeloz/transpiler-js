@@ -40,7 +40,16 @@ function processNode(node, variables) {
     case 'Str':
       return String(node.value)
     case 'Print':
-      return console.log(processNode(node.value, variables))
+      let valueToPrint = processNode(node.value, variables)
+      if (typeof valueToPrint === 'function') {
+        valueToPrint = '<#closure>'
+      }
+
+      if (Array.isArray(valueToPrint)) {
+        valueToPrint = `(${valueToPrint})`
+      }
+
+      return console.log(valueToPrint)
     case 'Bool':
       return Boolean(node.value)
     case 'Let':
@@ -79,6 +88,9 @@ function processNode(node, variables) {
         return returnValue
       }
       return memoized
+
+    case 'Tuple':
+      return [processNode(node.first), processNode(node.second)]
     default:
       console.error('Termo não encontrado', node.kind)
       break;
