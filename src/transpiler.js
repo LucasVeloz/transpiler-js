@@ -35,18 +35,24 @@ function operations(type, first, second) {
 
 function processNode(node, variables) {
   switch (node.kind) {
+    case 'File':
+      return node.expression
     case 'Int':
       return BigInt(node.value)
     case 'Str':
       return String(node.value)
     case 'Print':
-      let valueToPrint = processNode(node.value, variables)
+      const valueToPrint = processNode(node.value, variables)
       if (typeof valueToPrint === 'function') {
-        valueToPrint = '<#closure>'
+        return console.log('<#closure>')
       }
 
       if (Array.isArray(valueToPrint)) {
-        valueToPrint = `(${valueToPrint})`
+        return console.log(`(${valueToPrint})`)
+      }
+
+      if (typeof valueToPrint === 'bigint') {
+        return console.log(valueToPrint.toString())
       }
 
       return console.log(valueToPrint)
@@ -60,8 +66,7 @@ function processNode(node, variables) {
       if (value === undefined) throw new Error('Variável não definida')
       return value
     case 'Binary':
-      const toReturn = operations(node.op, processNode(node.lhs, variables), processNode(node.rhs, variables))
-      return toReturn;
+      return operations(node.op, processNode(node.lhs, variables), processNode(node.rhs, variables))
     case 'Function':
       return (args, variables) => {
         const scopeVariables = { ...variables }
