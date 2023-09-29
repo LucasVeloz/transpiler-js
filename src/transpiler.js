@@ -40,7 +40,8 @@ function processNode(node, variables) {
     case 'Int':
       return BigInt(node.value)
     case 'Str':
-      return String(node.value)
+      case 'Bool':
+      return node.value;
     case 'Print':
       const valueToPrint = processNode(node.value, variables)
       if (typeof valueToPrint === 'function') {
@@ -56,8 +57,6 @@ function processNode(node, variables) {
       }
 
       return console.log(valueToPrint)
-    case 'Bool':
-      return Boolean(node.value)
     case 'Let':
       variables[node.name.text] = processNode(node.value, variables)
       return processNode(node.next, {...variables })
@@ -96,10 +95,11 @@ function processNode(node, variables) {
 
     case 'Tuple':
       return [processNode(node.first), processNode(node.second)]
-    case 'First':
-      return processNode(node.value.first)
-    case 'Second':
-      return processNode(node.value.second)
+      case 'First':
+      case 'Second':
+      const tuple = processNode(node.value)
+      if (node.kind === 'First') return tuple[0]
+      return tuple[1]
     default:
       console.error('Termo não encontrado', node.kind)
       break;
