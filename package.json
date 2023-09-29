@@ -1,0 +1,21 @@
+{
+  "name": "transpiler",
+  "version": "1.0.0",
+  "description": "Um interpretador básico em JS para rinha",
+  "main": "src/index.js",
+  "scripts": {
+    "generate-ast": "rinha var/source.rinha>var/rinha/source.rinha.json",
+    "transpile": "node src/index.js var/rinha/source.rinha.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LucasVeloz/transpiler-js.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/LucasVeloz/transpiler-js/issues"
+  },
+  "homepage": "https://github.com/LucasVeloz/transpiler-js#readme"
+}
