@@ -1,9 +1,1 @@
-let fib = fn (n) => {
-  if (n < 2) {
-    n
-  } else {
-    fib(n - 1) + fib(n - 2)
-  }
-};
-
-print(fib(3490)) + print(second((10, 30)))
+print(first((second((print(10),20)), 30)))
